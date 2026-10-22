@@ -1,0 +1,16 @@
+[
+  {
+    "window": 10,
+    "independent_formula": "PASS",
+    "prefix_causality": "PASS",
+    "dates": 220,
+    "securities": 128
+  },
+  {
+    "window": 20,
+    "independent_formula": "PASS",
+    "prefix_causality": "PASS",
+    "dates": 220,
+    "securities": 128
+  }
+]

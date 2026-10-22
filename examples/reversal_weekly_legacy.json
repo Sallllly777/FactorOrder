@@ -1,0 +1,6 @@
+{
+  "name": "reversal",
+  "description": "5 日反转独立对照；检查换手与摩擦",
+  "alpha": "-rank(ts_return(close, 5))",
+  "settings": {"rebalance": "weekly", "top_n": 50, "retain_n": 75}
+}

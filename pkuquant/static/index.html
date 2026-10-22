@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><meta name="description" content="因序 因子研究工作台：编写因子，逐日回测，审阅交易结果。"><title>因序 · 因子研究工作台</title><link rel="icon" href="/assets/mark.svg" type="image/svg+xml"><link rel="stylesheet" href="/assets/app.css"><script src="/assets/app.js" defer></script></head>
+<body>
+<a class="skip" href="#main">跳到主要内容</a>
+<aside class="sidebar">
+  <a href="/" class="brand"><img src="/assets/mark.svg" alt="" width="35" height="35"><span>因序<small>FACTORORDER</small></span></a>
+  <div class="nav-label">研究空间</div>
+  <nav aria-label="主导航">
+    <button class="nav-item active" data-view="studio" aria-current="page"><span class="nav-icon">⌘</span>因子工作台<span class="nav-index">01</span></button>
+    <button class="nav-item" data-view="history"><span class="nav-icon">◷</span>回测记录<span class="nav-index" id="job-count">0</span></button>
+    <button class="nav-item" data-view="operators"><span class="nav-icon">ƒ</span>算子手册<span class="nav-index">03</span></button>
+  </nav>
+  <div class="sidebar-note"><span class="small-dot"></span> 因子批量算<br><span class="note-indent">交易逐日走</span><p>从一个想法<br>到一份可复查的结果。</p></div>
+  <div class="sidebar-bottom"><span class="version">v0.5.0</span><span>私有研究版</span><span class="status-dot" id="connection-dot"></span></div>
+</aside>
+<div class="shell">
+  <header class="topbar"><div class="breadcrumb">工作空间 <span>/</span> <strong id="page-label">因子工作台</strong></div><div class="header-actions"><span class="market-tag">A 股 · 日频 · 只做多</span><button class="quiet" id="connect-button">连接服务 <span>↗</span></button><button class="quiet" id="logout-button" hidden>断开</button></div></header>
+  <main id="main">
+    <section data-page="studio">
+      <div class="page-heading"><div><div class="eyebrow">EXPLORE. SIMULATE. UNDERSTAND.</div><h1>让你的因子，接受市场的检验<span class="accent">。</span></h1><p>用简洁表达式描述想法，让执行规则还原每一个交易日。</p></div><span class="outline-pill">研究工作台</span></div>
+      <div class="workspace">
+        <div class="main-column">
+          <section class="panel editor-panel" aria-labelledby="editor-title">
+            <div class="panel-head"><h2 id="editor-title"><span class="section-index">01</span>策略表达式</h2><span class="draft-status" id="draft-status">本地草稿</span></div>
+            <div class="template-row" id="templates" aria-label="因子示例"></div>
+            <div class="editor-top"><span class="file-dot"></span><span>alpha.expr</span><span class="editor-language">FACTOR EXPRESSION</span></div>
+            <div class="code-editor"><pre class="line-numbers" id="line-numbers" aria-hidden="true">1</pre><textarea id="alpha" aria-label="策略表达式" spellcheck="false" maxlength="6000" placeholder="例如：-rank(ts_std(returns, 60))"></textarea></div>
+            <div class="editor-help"><span><kbd>Ctrl</kbd> + <kbd>Enter</kbd> 运行回测</span><button class="text-button" id="show-operators">查看算子 <span>↗</span></button></div>
+            <div class="editor-footer"><div><span class="inline-dot"></span><span id="template-description">选择因子示例，或编写自己的表达式</span></div><div class="editor-tools"><button class="icon-button" id="import-strategy" title="导入策略 JSON" aria-label="导入策略 JSON">↓</button><button class="icon-button" id="export-strategy" title="导出策略 JSON" aria-label="导出策略 JSON">↑</button></div></div>
+            <input type="file" id="strategy-file" accept=".json,application/json" hidden>
+          </section>
+          <div class="run-bar"><div class="run-status" role="status" aria-live="polite"><span class="run-indicator" id="run-indicator"></span><div><strong id="run-status-title">准备开始研究</strong><small id="run-status-detail">设置回测区间，然后运行第一个因子。</small></div></div><div class="run-actions"><button class="secondary" id="cancel-job" hidden>取消任务</button><button class="primary" id="run-button" disabled><span>▶</span> 运行回测</button></div></div>
+          <p class="error-box" id="error-message" role="alert" hidden></p>
+          <section class="panel results-panel" aria-labelledby="results-title">
+            <div class="panel-head"><h2 id="results-title"><span class="section-index">02</span>回测结果</h2><span class="subtle" id="result-period">等待首个结果</span></div>
+            <div class="result-toolbar" id="result-toolbar" hidden><span class="result-badge" id="result-kind">回测结果</span><span class="subtle" id="result-id"></span><button class="text-button" id="reuse-result">载入此策略 ↗</button></div><pre class="result-expression" id="result-expression" hidden></pre>
+            <div class="metric-grid" id="metrics"><div><span>总收益</span><strong>—</strong><small>所选回测区间</small></div><div><span>年化收益</span><strong>—</strong><small>252 个交易日</small></div><div><span>夏普比率</span><strong>—</strong><small>零无风险利率</small></div><div><span>最大回撤</span><strong>—</strong><small>含初始资金基准</small></div></div>
+            <div class="chart-toolbar"><div class="chart-tabs" role="group" aria-label="图表指标"><button class="chart-tab active" data-chart="nav" aria-pressed="true">策略净值</button><button class="chart-tab" data-chart="drawdown" aria-pressed="false">回撤</button></div><span class="chart-legend"><i></i><span id="chart-legend-label">净值基准 1.00</span></span></div>
+            <div class="chart-area" id="chart-area"><div class="empty-state" id="result-empty"><span class="empty-symbol">⌁</span><strong>每个想法，都从一次回测开始</strong><p>运行后，在这里查看净值、风险和交易执行情况。</p></div><svg id="equity-chart" viewBox="0 0 900 270" role="img" aria-label="回测曲线" hidden></svg><div class="chart-tooltip" id="chart-tooltip" hidden></div></div>
+            <div class="result-detail" id="result-detail" hidden>
+              <p class="subtle" id="curve-note"></p>
+              <div class="detail-grid"><div><h3>执行摘要</h3><dl id="execution-summary"></dl></div><div><h3>因子诊断 <span>Rank IC</span></h3><dl id="ic-summary"></dl></div></div>
+              <div class="quality-notice" id="quality-notice"></div>
+              <details class="assumptions"><summary>模型假设与数据限制 <span>展开阅读</span></summary><ul id="limitations"></ul></details>
+              <div class="downloads"><span>导出研究记录</span><button class="secondary download" data-artifact="report.html">完整报告 ↗</button><button class="quiet download" data-artifact="orders.csv">订单 CSV ↓</button><button class="quiet download" data-artifact="daily.csv">净值 CSV ↓</button><button class="quiet download" data-artifact="manifest.json">配置与审计 ↓</button></div>
+            </div>
+          </section>
+          <p class="research-note"><span>ⓘ</span> 复权经济单位账户 · 日线近似成交。研究结果不等同于实盘收益。</p>
+        </div>
+        <aside class="panel settings-panel" aria-labelledby="settings-title"><div class="panel-head"><h2 id="settings-title">回测设置</h2><div class="settings-actions"><button class="text-button" id="reset-settings">重置</button><button class="text-button" id="toggle-settings" aria-expanded="false" aria-controls="settings-form">展开设置 +</button></div></div><form id="settings-form"><div class="settings-group"><div class="group-label">数据与区间</div><label class="field">数据源<select id="source" required><option value="">请先连接服务</option></select></label><p class="source-description" id="source-description">由管理员配置可用的数据快照</p><div class="two-fields"><label class="field">开始日期<input name="start" type="date" required></label><label class="field">结束日期<input name="end" type="date" required></label></div><p class="field-hint">区间由策略模板或已有草稿载入；运行前请确认数据覆盖与研究用途。</p></div><div class="settings-group"><div class="group-label">组合构建</div><div id="portfolio-fields"></div></div><details class="settings-group" open><summary>执行与交易成本 <span>−</span></summary><div id="execution-fields"></div></details><details class="settings-group"><summary>数据与风险约束 <span>+</span></summary><div id="risk-fields"></div></details><details class="settings-group"><summary>更多研究参数 <span>+</span></summary><div id="advanced-fields"></div></details><div class="settings-footnote"><span class="small-dot"></span> 信号至少延迟 1 个交易日<br>未成交订单不会虚构为成交</div></form></aside>
+      </div>
+    </section>
+    <section data-page="history" hidden><div class="page-heading"><div><div class="eyebrow">RESEARCH JOURNAL</div><h1>每一次尝试，都有迹可循<span class="accent">。</span></h1><p>最近 100 个任务，共享研究服务中的完整运行记录。</p></div><button class="secondary" id="refresh-history">刷新记录 ↻</button></div><div class="panel history-panel"><div class="panel-head"><h2>回测记录</h2><span class="subtle">按创建时间倒序</span></div><div id="history-empty" class="empty-state"><span class="empty-symbol">◷</span><strong>还没有运行记录</strong><p>连接服务并运行一个因子，研究记录会保存在这里。</p></div><div class="table-wrap"><table id="history-table" hidden><thead><tr><th>任务</th><th>创建时间</th><th>状态</th><th>总耗时</th><th>操作</th></tr></thead><tbody id="history-rows"></tbody></table></div></div></section>
+    <section data-page="operators" hidden><div class="page-heading"><div><div class="eyebrow">FACTOR TOOLKIT</div><h1>简单算子，组合你的想法<span class="accent">。</span></h1><p>横截面与时间序列算子，可用分号或换行定义中间变量。</p></div></div><div class="operator-layout"><section class="panel"><div class="panel-head"><h2>常用算子</h2></div><div id="operator-list"></div></section><section class="panel field-reference"><h2>可用字段</h2><dl><dt>open / high / low / close</dt><dd>原始价格；历史窗口按当时前复权口径对齐。</dd><dt>returns</dt><dd>相邻交易日期的前复权收益率。</dd><dt>amt</dt><dd>成交金额，单位取决于接入数据的规范化配置。</dd><dt>num_trades</dt><dd>成交笔数，不代表成交股数。</dd><dt>volume</dt><dd>仅在数据源提供真实成交股数时可用。</dd></dl><p class="field-hint">不支持未来窗口、任意 Python 或外部网络调用。数据缺失会按回测规则处理。</p></section></div></section>
+    <footer class="footer"><span>因序 FactorOrder</span><span>想法需要验证，结果需要复查。</span></footer>
+  </main>
+</div>
+<dialog id="login-dialog"><form id="login-form"><div class="login-brand"><img src="/assets/mark.svg" width="40" height="40" alt=""><span>因序 · 你的量化研究空间</span></div><h2>连接私有研究服务</h2><p>输入启动服务时设置的访问密钥，进入工作台。</p><label class="field">访问密钥<input id="access-key" type="password" required autocomplete="off" placeholder="请输入访问密钥"></label><p id="login-error" class="login-error" role="alert"></p><button class="primary" type="submit" id="login-submit">进入工作台 <span>→</span></button><button class="text-button" type="button" id="close-login">先浏览界面</button><small>会话有效期 8 小时 · 研究任务由服务保存</small></form></dialog>
+<div id="toast" role="status" hidden></div>
+</body></html>

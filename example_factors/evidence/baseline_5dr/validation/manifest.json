@@ -1,0 +1,192 @@
+{
+  "expression": "-rank(ts_return(close, 5))",
+  "fields": [
+    "close"
+  ],
+  "accounting": "total_return_economic_units",
+  "source": "feathers.zip (not distributed)",
+  "source_sha256": "5766950f2a105244867b842709cf4bad890e4e11df0eebeeaa4fec42dc05803d",
+  "quality": {
+    "start": "2020-01-02",
+    "end": "2026-10-15",
+    "dates": 1642,
+    "securities": 5451,
+    "zero_amount_with_price": 23219,
+    "missing_factor_with_price": 0,
+    "missing_trades_with_price": 59,
+    "all_missing_trade_dates": [],
+    "has_share_volume": false,
+    "provenance": {}
+  },
+  "effective_end": "2026-10-15",
+  "trimmed_dates": [
+    "2026-10-16"
+  ],
+  "trading_states_sha256": null,
+  "limitations": [
+    "账户采用复权经济单位，隐含公司行动调整及分红再投资；不重建真实分红税、现金到账日与股份可卖日。持仓 shares_equiv 是原始价格对应的经济等效股数。",
+    "股数计划=previous_close；previous_close 使用前收与前日权益固定计划，execution_open 为旧版开盘重算研究假设。信号延迟与计划日期单独记录。容量=lagged_adv；lagged_adv 仅用前日均额和前收固定容量股数。日线仍不能证明开盘流动性或排队成交。",
+    "无逐日交易规则时使用标记的估计：已知普通主板按10%，主板ST或未知状态在2026-07-06前按5%保守阈值；不能替代官方ST/IPO/除权特例数据。缓存重建规则也不等于官方逐日限价。",
+    "所有高低价相同的日线都拒绝成交，这是保守假设；不会把涨停卖出等同于交易所禁止卖出。",
+    "滑点后价格恰好触及不利方向涨跌停也拒单。前收定量模式对复权因子相对变化超过1e-5的日期取消旧计划；阈值用于过滤源数据微小噪声，不证明较小公司行动不存在。仍是经济单位账户，未据此生成真实分红或送转股份。",
+    "amt 乘数为 1；原始供应商单位未确认，默认按元解释。num_trades 不作为成交股数或 VWAP 分母。",
+    "佣金、最低收费和滑点为可配置研究假设；过户等额外费用率设为 1e-05。印花税按配置及历史切换日处理，非完整券商交割单。",
+    "缺失/无成交行情持仓保留最近估值；停滞 20 日后的估值折扣为 0%。不事后在最后有行情日强制卖出，不证明退市处置价值。",
+    "ST 策略=exclude，未知状态=allow；开盘状态覆盖率=0.0，未知证券日=7835564。只有输入的历史状态可用于过滤；未提供状态不等于普通股。",
+    "无历史行业/市值，未实施行业中性、规模中性；历史数据覆盖仍可能存在供应商选择偏差。",
+    "未自动寻优；本报告不是样本外盈利认证。夏普使用零无风险利率、日收益和固定年化系数。",
+    "末尾成交笔数整行缺失，自动剔除日期：2026-10-16。"
+  ],
+  "execution_contract_version": "0.5",
+  "historical_reference": null,
+  "security_history_sha256": null,
+  "st_coverage": {
+    "required_cells": 7835564,
+    "unknown_cells": 7835564,
+    "known_st_cells": 0,
+    "coverage": 0.0
+  },
+  "provider_bundle": null,
+  "readiness": {
+    "checks": {
+      "non_synthetic_dataset": true,
+      "historical_st_complete": false,
+      "daily_rules_complete": false,
+      "amount_units_explicit": false,
+      "share_volume_present": false,
+      "trade_counts_present": false,
+      "adjustment_factors_present": false,
+      "calendar_verified": false
+    },
+    "st_coverage": {
+      "required_cells": 2229162,
+      "unknown_cells": 2229162,
+      "known_st_cells": 0,
+      "coverage": 0.0
+    },
+    "rule_cells": 0,
+    "required_rule_cells": 2229162,
+    "verified_data_ready": false,
+    "blockers": [
+      "historical_st_complete",
+      "daily_rules_complete",
+      "amount_units_explicit",
+      "share_volume_present",
+      "trade_counts_present",
+      "adjustment_factors_present",
+      "calendar_verified"
+    ],
+    "live_trading_ready": false,
+    "live_blockers": [
+      "No real corporate-action cash/share entitlement ledger",
+      "No order gateway, broker reconciliation or live risk controls",
+      "Daily bars do not establish opening liquidity or limit-order queue fills"
+    ],
+    "note": "Source declarations and coverage checks are not independent vendor certification; absent bars require an external trading calendar/security master."
+  },
+  "references": [
+    "https://www.worldquant.com/brain/",
+    "https://www.sse.com.cn/lawandrules/sselawsrules2025/trade/universal/c/c_20260424_10816492.shtml"
+  ],
+  "factor_diagnostics": {
+    "rank_ic_1d": {
+      "mean": 0.030944042523352984,
+      "valid_dates": 429
+    },
+    "rank_ic_5d": {
+      "mean": 0.02898279291082928,
+      "valid_dates": 425
+    },
+    "rank_ic_20d": {
+      "mean": 0.03931246023275795,
+      "valid_dates": 410
+    }
+  },
+  "settings": {
+    "start": "2025-01-02",
+    "end": "2026-10-16",
+    "initial_cash": 1000000,
+    "universe": "all",
+    "min_history": 60,
+    "active_window": 1,
+    "liquidity_window": 20,
+    "liquidity_quantile": 0,
+    "top_n": 20,
+    "retain_n": 20,
+    "max_weight": 0.0475,
+    "rebalance": "daily",
+    "delay": 1,
+    "decay": 1,
+    "commission": 0.0003,
+    "min_commission": 5.0,
+    "slippage_bps": 5,
+    "transfer_rate": 1e-05,
+    "stamp_tax": true,
+    "amount_participation": 0.01,
+    "amount_multiplier": 1.0,
+    "stale_haircut_after": 20,
+    "stale_haircut": 0.0,
+    "require_trade_counts": true,
+    "annualization": 252,
+    "execution": "conservative_daily",
+    "st_policy": "exclude",
+    "unknown_st": "allow",
+    "liquidate_st": true,
+    "require_verified_rules": false,
+    "volume_participation": 0.01,
+    "sizing": "previous_close",
+    "capacity": "lagged_adv",
+    "gross_exposure": 0.6,
+    "min_price": 3,
+    "min_avg_amount": 20000000,
+    "valid_price_window": 20,
+    "round_fees": true
+  },
+  "metrics": {
+    "total_return": 0.14655826371407255,
+    "annual_return": 0.08345005034354114,
+    "annual_volatility": 0.23014213583423862,
+    "sharpe_zero_rf": 0.4633117674970562,
+    "max_drawdown": -0.38681882626186703,
+    "trading_days": 430,
+    "total_explicit_cost": 201000.54,
+    "annual_turnover_two_sided": 158.757308951652,
+    "orders": 13984,
+    "orders_with_fills": 10475,
+    "order_fill_rate": 0.7490703661327232,
+    "end_cash": 611140.4937140725,
+    "end_nav": 1146558.2637140725,
+    "end_stale_exposure": 0.0,
+    "max_stale_exposure": 278866.55,
+    "estimated_rule_orders": 13569,
+    "reconstructed_rule_orders": 0,
+    "rejection_reasons": {
+      "below_minimum_order": 1923,
+      "slipped_price_outside_bar": 612,
+      "no_trading_amount": 379,
+      "flat_bar_uncertain": 259,
+      "open_outside_rule_bounds": 183,
+      "below_minimum_sell": 76,
+      "corporate_action_cancel_replan": 36,
+      "limit_down_or_conservative_bound": 25,
+      "limit_up_or_conservative_bound": 8,
+      "slipped_price_at_adverse_limit": 7,
+      "missing_lagged_liquidity": 1,
+      "amount_cap": 1
+    }
+  },
+  "created_utc": "2026-10-21T14:12:45.270453+00:00",
+  "code_sha256": "8e0d6be51bac71a273909537c3907839a803fa79b3422b2d7e72ea80ce81adc7",
+  "python": "3.13.8",
+  "packages": {
+    "numpy": "2.2.3",
+    "pandas": "2.2.3",
+    "pyarrow": "26.0.0"
+  },
+  "public_export": {
+    "source_run_id": "5dr_buffer_exposure_20261021_220424/validation_exposure",
+    "original_manifest_sha256": "7a059cfd62c8805a7ae81829fce625c99bf0a7b7a2e7371e2a9f6ab41de1b68d",
+    "original_source_snapshot_sha256": "50e192ee3fd224538ed137e4624ac4ff994bd9fd870679f4eed90d1ad4e6dfed",
+    "note": "Curated export: source path redacted, report branding/links amended. CSV bytes unchanged. Original source archive not distributed; original manifest hash is provenance, not this sanitized file hash."
+  }
+}

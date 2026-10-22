@@ -1,0 +1,23 @@
+# 本地发布核验 · 2026-10-22
+
+本记录针对 FactorOrder 首次仓库整理版，非实盘或目标服务器验收。
+
+| 项目 | 结果 |
+| --- | --- |
+| 全部单元/集成测试 | 80 项通过，含成交约束、历史 ST、因果性、Provider、任务服务、鉴权及网页接口 |
+| 公开研究证据 | 76 个文件的 SHA-256 一致，8 个区间运行的净值、收益、回撤、费用和 IC 摘要核验通过 |
+| 完整账本 | 三个入选策略各含训练/验证委托、持仓、目标；订单数量与费用汇总相符 |
+| 基础 5DR 证据 | 训练/验证逐日净值、IC 和脱敏 manifest 保留为参考，未列为第四个入选策略 |
+| 原研究计算代码 | engine/factors/api/data/diagnostics/config/security/reference 与各原始代码快照一致（忽略平台换行） |
+| 合成数据演示 | `examples/provider_demo.py` 成功生成 DatasetBundle 和报告 |
+| 前端脚本 | `node --check pkuquant/static/app.js` 通过 |
+| wheel 构建 | setuptools 构建成功，包含全部静态 UI 和 JSON 模板，以及两个 CLI 入口 |
+| wheel 导入 | 解包后从包目录运行 operators 成功；未依赖源码目录导入 |
+| 文档链接 | 已交付 Markdown 与公开 HTML 的本地链接目标存在 |
+| Git 内容 | 公开证据暂存字节与本地文件一致；`git diff --cached --check` 通过 |
+
+本机为 Windows、Python 3.13.8，NumPy/pandas 使用已有环境，PyArrow 使用工作区既有依赖路径；没有声称在新建虚拟环境中联网安装验证。最初 pip wheel 包装命令受系统临时目录权限影响，随后直接调用同一 setuptools 构建后端成功。平台代码与源码 ZIP 不包含这些本机依赖或绝对路径。
+
+GitHub Actions 的 Windows/Linux 流程已提供，但上传前尚无远端执行结果。Linux、真实供应商、目标服务器、TLS、负载和灾难恢复仍需在相应环境验收。合成数据运行正常不代表市场数据完整；原研究数据的 ST/官方规则/单位限制保留在每份报告中。
+
+本次未重新运行全量真实行情回测；公开指标来自已保存的研究结果，整理时重新核验输出的一致性。历史验证段参与过研究决策，不是独立盲测。

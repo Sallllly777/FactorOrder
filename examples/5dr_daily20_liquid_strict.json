@@ -1,0 +1,17 @@
+{
+  "name": "5DR 每日20只流动性对照（需历史状态缓存）",
+  "description": "描述性研究配置，未按2021-2024训练选出，不等于Stoneflow原始股份账户复现。必须提供历史ST/前收缓存，未知状态排除。",
+  "alpha": "-rank(ts_return(close, 5))",
+  "settings": {
+    "start": "2025-01-02", "end": "2026-09-30",
+    "universe": "all", "min_history": 60, "active_window": 1,
+    "valid_price_window": 20, "liquidity_quantile": 0,
+    "min_price": 3, "min_avg_amount": 20000000,
+    "top_n": 20, "retain_n": 20, "max_weight": 0.0475,
+    "gross_exposure": 0.95, "rebalance": "daily",
+    "slippage_bps": 5, "transfer_rate": 0.00001,
+    "amount_participation": 0.01, "sizing": "previous_close",
+    "capacity": "lagged_adv", "round_fees": true,
+    "unknown_st": "exclude"
+  }
+}

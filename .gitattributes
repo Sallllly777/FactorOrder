@@ -1,0 +1,5 @@
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+# Preserve all published evidence bytes and checksums across OS/clone settings.
+example_factors/** -text whitespace=cr-at-eol

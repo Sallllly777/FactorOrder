@@ -1,0 +1,11 @@
+{
+  "sources": {
+    "synthetic_demo": {
+      "data": "../outputs/provider_demo/bundle"
+    }
+  },
+  "root": "../service-data/demo",
+  "timeout": 1800,
+  "max_queue": 8,
+  "max_jobs": 1000
+}

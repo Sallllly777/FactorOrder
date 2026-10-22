@@ -1,0 +1,50 @@
+[
+  {
+    "run": "train_5d",
+    "status": "REUSED_VERIFIED",
+    "original_checks": {
+      "run": "train_intraday",
+      "cash_nav_fees_units_dates_limits_checksums": "PASS",
+      "days": 969,
+      "orders": 31667
+    }
+  },
+  {
+    "run": "train_10d",
+    "cash_nav_fees_units_dates_limits_checksums": "PASS",
+    "days": 969,
+    "orders": 29198,
+    "target_weights": "PASS"
+  },
+  {
+    "run": "train_20d",
+    "cash_nav_fees_units_dates_limits_checksums": "PASS",
+    "days": 969,
+    "orders": 26653,
+    "target_weights": "PASS"
+  },
+  {
+    "run": "validation_5d",
+    "status": "REUSED_VERIFIED",
+    "original_checks": {
+      "run": "validation_intraday",
+      "cash_nav_fees_units_dates_limits_checksums": "PASS",
+      "days": 430,
+      "orders": 13986
+    }
+  },
+  {
+    "run": "validation_10d",
+    "cash_nav_fees_units_dates_limits_checksums": "PASS",
+    "days": 430,
+    "orders": 12841,
+    "target_weights": "PASS"
+  },
+  {
+    "run": "validation_20d",
+    "cash_nav_fees_units_dates_limits_checksums": "PASS",
+    "days": 430,
+    "orders": 11809,
+    "target_weights": "PASS"
+  }
+]

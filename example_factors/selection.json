@@ -1,0 +1,16 @@
+{
+  "criterion": "Validation cumulative net return among six same-setting signal configurations; post-hoc exploratory selection",
+  "selected": [
+    "intraday_20d",
+    "intraday_10d",
+    "intraday_5d"
+  ],
+  "unseen_holdout": false,
+  "raw_data_distributed": false,
+  "baseline_preserved": true,
+  "research_runs": [
+    "intraday_windows_20261022_113253",
+    "5dr_extensions_20261022_110206",
+    "5dr_buffer_exposure_20261021_220424"
+  ]
+}

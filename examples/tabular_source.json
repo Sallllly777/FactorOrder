@@ -1,0 +1,7 @@
+{
+  "path": "vendor_daily.csv",
+  "mapping": {"trade_date": "date", "ts_code": "code", "amount": "amt", "vol": "volume", "adj_factor": "cumadj"},
+  "amount_unit": "CNY_1K",
+  "volume_unit": "lots100",
+  "price_mode": "raw"
+}

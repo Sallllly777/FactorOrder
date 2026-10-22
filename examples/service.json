@@ -1,0 +1,7 @@
+{
+  "sources": {"original": {"data": "../feathers.zip"}},
+  "root": "../service-data",
+  "timeout": 1800,
+  "max_queue": 8,
+  "max_jobs": 1000
+}

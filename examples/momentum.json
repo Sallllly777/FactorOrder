@@ -1,0 +1,6 @@
+{
+  "name": "momentum",
+  "description": "中期动量，跳过最近 20 日；未经调优的研究起点",
+  "alpha": "rank(ts_delay(close, 20) / ts_delay(close, 120) - 1)",
+  "settings": {"rebalance": "weekly", "top_n": 50, "retain_n": 75, "decay": 1}
+}

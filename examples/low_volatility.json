@@ -1,0 +1,6 @@
+{
+  "name": "low_volatility",
+  "description": "60 日低波动独立对照，收益使用前复权相邻价格比",
+  "alpha": "-rank(ts_std(returns, 60))",
+  "settings": {"rebalance": "weekly", "top_n": 50, "retain_n": 75}
+}

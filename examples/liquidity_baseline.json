@@ -1,0 +1,6 @@
+{
+  "name": "liquidity_baseline",
+  "description": "按过去 20 日成交金额选 50 只等权股票；非全市场指数",
+  "alpha": "rank(ts_mean(amt, 20))",
+  "settings": {"rebalance": "weekly", "top_n": 50, "retain_n": 75}
+}
