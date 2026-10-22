@@ -39,3 +39,5 @@
 基础版验证净收益为正，同时最大回撤很大。不能将“正收益”写成“预测准确”或将其等同于已达到产品/实盘验收。原始基础版继续作为 UI 默认研究基线，与入选的三个日内变体分别保留。
 
 基础版证据位于 `evidence/baseline_5dr/`；这是基线对照，不是第四个入选策略。配置为 [baseline_5dr_strategy.json](baseline_5dr_strategy.json)。
+
+[基础5DR完整报告](baseline_5dr_report.html)与[信息隔离审计](../docs/research_integrity.md)已补齐。当前日线成交检查会用执行日全日数据，并非严格开盘时点无前视执行；验证期也已用于研究选择。

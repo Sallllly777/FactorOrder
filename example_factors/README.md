@@ -36,3 +36,5 @@ GitHub 文件页不直接渲染 HTML。可先读各 README 的表格，或下载
 这些结果是日频做多研究，采用复权经济单位账户，隐含公司行动调整及分红再投资，未重建真实股份、现金到账日与分红税。历史 ST 覆盖为 0，未知状态允许进入；涨跌停使用保守估计，未提供官方逐日规则。amt 暂按元解释但供应商单位未确认，num_trades 不是成交股数。缺少真实股数容量、独立交易日历、历史行业/市值及完整退市处置数据；停滞估值未施加折扣。日线不能证明开盘流动性或排队成交。尚无真实券商联调及目标服务器验收。
 
 日内反转研究背景可参见 [Short-Term Return Reversals and Intraday Transactions](https://doi.org/10.1142/S2010139219500022)。项目的窗口、过滤和组合设定是自己的探索性配置，不宣称复现该论文。研究流程参考 [WorldQuant BRAIN](https://www.worldquant.com/brain/)，没有官方关联或算子兼容承诺。
+
+[基础5DR完整报告](baseline_5dr_report.html) · [信息隔离与偏差审计](../docs/research_integrity.md)。基础对照已补齐训练/验证完整账本，不占三个入选示例名额。

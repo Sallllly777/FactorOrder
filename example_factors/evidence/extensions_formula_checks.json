@@ -1,0 +1,23 @@
+[
+  {
+    "factor": "volatility_scaled",
+    "independent_formula": "PASS",
+    "prefix_causality": "PASS",
+    "dates": 220,
+    "securities": 128
+  },
+  {
+    "factor": "intraday",
+    "independent_formula": "PASS",
+    "prefix_causality": "PASS",
+    "dates": 220,
+    "securities": 128
+  },
+  {
+    "factor": "amount_shock",
+    "independent_formula": "PASS",
+    "prefix_causality": "PASS",
+    "dates": 220,
+    "securities": 128
+  }
+]

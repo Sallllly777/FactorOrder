@@ -108,3 +108,5 @@ python -m pip wheel --no-deps . --wheel-dir dist
 [算子语义](docs/operators.md) · [数据源与ST](docs/data_sources.md) · [Provider接口](docs/provider_contract.md) · [网页说明](docs/web_ui.md) · [私有部署](docs/deployment.md) · [GitHub上传](docs/github_upload.md) · [版本说明](CHANGELOG.md)
 
 仓库未指定开源许可证；整理本地 Git 不代表已经选择对外授权条款。
+
+[基础5DR完整报告](example_factors/baseline_5dr_report.html) · [信号隔离、验证污染与日线撮合偏差](docs/research_integrity.md)

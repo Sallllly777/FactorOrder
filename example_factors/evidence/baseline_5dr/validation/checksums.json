@@ -1,5 +1,9 @@
 {
   "daily.csv": "5128fa6f0af7fd3976455eeeaaa9ede7ef3fa4e1b6eaac0f8712c8fd0a1a2240",
   "factor_diagnostics.csv": "8dc339fae7fcf5309751a18282d0df7983a8c3e046b2b860799fb7a9b66bd156",
-  "manifest.json": "d22b225545d2e7e5a9f1ae6954c2a59cbf0a562b5aae3e8a245bfc5390d45c1c"
+  "holdings.csv": "55e057c5f185aa98aeeae7357fd6f19417aab5c64d53f83b9166a7c937168d7a",
+  "manifest.json": "d22b225545d2e7e5a9f1ae6954c2a59cbf0a562b5aae3e8a245bfc5390d45c1c",
+  "orders.csv": "d4d8aab3e4d6954941ff83c5bec956c38f472ab1562deda1edc05ed18ede08b2",
+  "report.html": "4a461fa6c7b40aa5012710b52fdf8807705fc5fc28f101d3329cdabfd0b1e86b",
+  "targets.csv": "605c55e60c363ad931147c628a9a278dfe90f2c8d25317bba9801667ad98822d"
 }
