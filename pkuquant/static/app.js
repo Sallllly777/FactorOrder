@@ -47,7 +47,7 @@ function safeAction(fn) { return async (...args)=>{try {await fn(...args);}catch
 function view(name) {
   document.querySelectorAll('[data-page]').forEach(e=>{e.hidden=e.dataset.page!==name;});
   document.querySelectorAll('[data-view]').forEach(e=>{const active=e.dataset.view===name;e.classList.toggle('active',active);if(active)e.setAttribute('aria-current','page');else e.removeAttribute('aria-current');});
-  $('page-label').textContent={studio:'因子工作台',history:'回测记录',operators:'算子手册'}[name];
+  $('page-label').textContent={studio:'因子工作台',history:'回测记录',evaluation:'因子评价',operators:'算子手册'}[name];
   if(name==='history'&&state.connected) refreshHistory().catch(e=>error(e.message));
 }
 function buildFields() {
@@ -78,7 +78,7 @@ function getSettings() {
 function updateEditor() { const lines=$('alpha').value.split('\n').length; $('line-numbers').textContent=Array.from({length:lines},(_,i)=>i+1).join('\n'); }
 function saveDraft() {
   if(!state.config)return;
-  try {localStorage.setItem('pkuquant-draft-v1',JSON.stringify({alpha:$('alpha').value,settings:getSettings(),source:$('source').value}));$('draft-status').textContent='草稿已保存';}
+  try {localStorage.setItem('pkuquant-draft-v1',JSON.stringify({alpha:$('alpha').value,settings:getSettings(),evaluation:getEvaluation(),source:$('source').value}));$('draft-status').textContent='草稿已保存';}
   catch {$('draft-status').textContent='草稿仅保留在当前页';}
 }
 function chooseTemplate(template) {
@@ -126,7 +126,7 @@ function validateDraft(draft) {
     if(fields[name]?.[1]==='select'&&!(value in fields[name][3]))throw new Error('参数选项不正确：'+name);
   }
 }
-function setDraft(draft) { validateDraft(draft);$('alpha').value=draft.alpha;applySettings(draft.settings||{});if(state.config.sources.some(s=>s.id===draft.source))$('source').value=draft.source;updateSourceDescription();updateEditor();state.selectedTemplate=null;document.querySelectorAll('.template-button').forEach(e=>e.classList.remove('active'));$('template-description').textContent='自定义策略 · 参数与表达式已载入';saveDraft(); }
+function setDraft(draft) { validateDraft(draft);$('alpha').value=draft.alpha;applySettings(draft.settings||{});applyEvaluation(draft.evaluation);if(state.config.sources.some(s=>s.id===draft.source))$('source').value=draft.source;updateSourceDescription();updateEditor();state.selectedTemplate=null;document.querySelectorAll('.template-button').forEach(e=>e.classList.remove('active'));$('template-description').textContent='自定义策略 · 参数与表达式已载入';saveDraft(); }
 function jobStatus(job) {
   const active=['queued','running'].includes(job.status);
   $('run-indicator').classList.toggle('busy',active);$('cancel-job').hidden=!active;
@@ -141,7 +141,14 @@ async function run() {
   if(!$('settings-form').reportValidity())return;
   if(!$('alpha').value.trim())throw new Error('请先编写策略表达式。');
   const settings=getSettings();if(settings.start>settings.end)throw new Error('开始日期不能晚于结束日期。');if(settings.retain_n<settings.top_n)throw new Error('保留排名上限不能小于目标持仓数。');
-  const body=JSON.stringify({source:$('source').value,alpha:$('alpha').value,settings});
+  const evaluation=getEvaluation();
+  const split=[evaluation.train_start,evaluation.train_end,evaluation.validation_start,evaluation.validation_end];
+  if(split.some(Boolean)){
+    if(!split.every(Boolean))throw new Error('训练与验证区间需要填写全部四个日期。');
+    if(!(split[0]<=split[1]&&split[1]<split[2]&&split[2]<=split[3]))throw new Error('训练区间必须早于验证区间，且各自开始日期不能晚于结束日期。');
+    if(settings.start>split[0]||settings.end<split[3])throw new Error('请扩展整体回测区间，使其覆盖训练与验证区间。');
+  }
+  const body=JSON.stringify({source:$('source').value,alpha:$('alpha').value,settings,evaluation});
   // Reuse a key after a network failure with the same payload, avoiding duplicate jobs.
   if(!state.pending||state.pending.body!==body)state.pending={body,key:crypto.randomUUID()};
   $('run-button').disabled=true;state.submitting=true;
@@ -199,7 +206,7 @@ async function selectResult(jid) {
   $('quality-notice').textContent=notice;
   $('limitations').replaceChildren(...result.limitations.map(text=>node('li',text)));
   $('curve-note').textContent=result.curve_sampled?'图表经过抽样，指标按全部交易日计算。':'图表展示本次回测的全部交易日；净值包含费用与成交滑点。';
-  drawChart();
+  renderEvaluation(result);drawChart();
 }
 function svgNode(tag,attrs,text){const e=document.createElementNS('http://www.w3.org/2000/svg',tag);for(const [k,v]of Object.entries(attrs))e.setAttribute(k,v);if(text!==undefined)e.textContent=text;return e;}
 function drawChart() {
@@ -222,7 +229,7 @@ async function downloadArtifact(name){if(!state.resultJob)return;const response=
 document.querySelectorAll('[data-view]').forEach(e=>e.onclick=()=>view(e.dataset.view));
 $('show-operators').onclick=()=>view('operators');$('connect-button').onclick=()=>{if(state.connected)toast('已连接私有研究服务');else showLogin();};$('close-login').onclick=()=>$('login-dialog').close();
 $('login-form').onsubmit=async event=>{event.preventDefault();$('login-submit').disabled=true;$('login-error').textContent='';try {const key=$('access-key').value;await api('/session',{method:'POST',headers:{Authorization:'Bearer '+key}});$('access-key').value='';await connect();$('login-dialog').close();toast('研究服务已连接');}catch(e){$('login-error').textContent=e.message==='请连接服务后继续。'?'访问密钥不正确，请重试。':e.message;}finally{$('login-submit').disabled=false;}};
-$('logout-button').onclick=safeAction(async()=>{await api('/session',{method:'DELETE'});setConnected(false);clearTimeout(state.timer);state.activeJob=null;state.selection++;state.result=null;state.resultJob=null;state.jobs=[];$('job-count').textContent='0';$('history-rows').replaceChildren();$('history-table').hidden=true;$('history-empty').hidden=false;$('result-detail').hidden=true;$('result-toolbar').hidden=true;$('result-expression').hidden=true;$('equity-chart').setAttribute('hidden','');$('chart-tooltip').hidden=true;$('result-empty').hidden=false;$('result-period').textContent='等待首个结果';$('metrics').querySelectorAll('strong').forEach(e=>{e.textContent='—';e.className='';});$('cancel-job').hidden=true;$('run-indicator').classList.remove('busy');$('run-status-title').textContent='已断开服务';$('run-status-detail').textContent='重新连接后可查看任务；正在运行的任务不会被取消。';toast('已断开；本地策略草稿保留');});
+$('logout-button').onclick=safeAction(async()=>{await api('/session',{method:'DELETE'});setConnected(false);clearTimeout(state.timer);state.activeJob=null;state.selection++;state.result=null;state.resultJob=null;renderEvaluation(null);state.jobs=[];$('job-count').textContent='0';$('history-rows').replaceChildren();$('history-table').hidden=true;$('history-empty').hidden=false;$('result-detail').hidden=true;$('result-toolbar').hidden=true;$('result-expression').hidden=true;$('equity-chart').setAttribute('hidden','');$('chart-tooltip').hidden=true;$('result-empty').hidden=false;$('result-period').textContent='等待首个结果';$('metrics').querySelectorAll('strong').forEach(e=>{e.textContent='—';e.className='';});$('cancel-job').hidden=true;$('run-indicator').classList.remove('busy');$('run-status-title').textContent='已断开服务';$('run-status-detail').textContent='重新连接后可查看任务；正在运行的任务不会被取消。';toast('已断开；本地策略草稿保留');});
 $('run-button').onclick=safeAction(run);$('cancel-job').onclick=safeAction(async()=>{if(state.activeJob){await api(`/jobs/${state.activeJob}/cancel`,{method:'POST'});await poll();}});
 $('refresh-history').onclick=safeAction(refreshHistory);$('reuse-result').onclick=safeAction(()=>reuseJob(state.resultJob));
 $('alpha').addEventListener('input',()=>{updateEditor();saveDraft();state.selectedTemplate=null;document.querySelectorAll('.template-button').forEach(e=>e.classList.remove('active'));$('template-description').textContent='自定义策略 · 使用常用算子组合研究想法';});
@@ -235,8 +242,8 @@ $('toggle-settings').onclick=()=>setSettingsExpanded($('toggle-settings').getAtt
 $('reset-settings').onclick=()=>{const template=state.config.templates.find(t=>t.id===state.selectedTemplate);applySettings(template?.settings||state.config.defaults);saveDraft();toast('已恢复当前模板参数');};
 document.querySelectorAll('[data-chart]').forEach(e=>e.onclick=()=>{state.chart=e.dataset.chart;document.querySelectorAll('[data-chart]').forEach(b=>{b.classList.toggle('active',b===e);b.setAttribute('aria-pressed',b===e?'true':'false');});drawChart();});
 document.querySelectorAll('.download').forEach(e=>e.onclick=safeAction(()=>downloadArtifact(e.dataset.artifact)));
-$('export-strategy').onclick=()=>downloadBlob(new Blob([JSON.stringify({name:'my_alpha',alpha:$('alpha').value,settings:getSettings()},null,2)],{type:'application/json'}),'strategy.json');
+$('export-strategy').onclick=()=>downloadBlob(new Blob([JSON.stringify({name:'my_alpha',alpha:$('alpha').value,settings:getSettings(),evaluation:getEvaluation()},null,2)],{type:'application/json'}),'strategy.json');
 $('import-strategy').onclick=()=>$('strategy-file').click();$('strategy-file').onchange=safeAction(async()=>{const file=$('strategy-file').files[0];if(!file)return;try {if(file.size>32768)throw new Error('策略 JSON 不能超过 32 KiB。');setDraft(JSON.parse(await file.text()));toast('策略已导入');}finally{$('strategy-file').value='';}});
 
-async function init(){buildFields();const catalog=await api('/ui/catalog');fillCatalog(catalog);applySettings(catalog.defaults);const draft=readDraft();state.preferredSource=draft?.source;if(draft){try{setDraft(draft);}catch{chooseTemplate(catalog.templates[0]);}}else chooseTemplate(catalog.templates[0]);try{await connect();}catch{showLogin();}}
+async function init(){buildFields();const catalog=await api('/ui/catalog');fillCatalog(catalog);applySettings(catalog.defaults);applyEvaluation();const draft=readDraft();state.preferredSource=draft?.source;if(draft){try{setDraft(draft);}catch{chooseTemplate(catalog.templates[0]);}}else chooseTemplate(catalog.templates[0]);try{await connect();}catch{showLogin();}}
 init().catch(e=>error('无法加载工作台：'+e.message));

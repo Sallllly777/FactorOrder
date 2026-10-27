@@ -94,7 +94,7 @@ def main(argv=None):
             if args.end: opts['end']=args.end
             if args.cash is not None: opts['initial_cash']=args.cash
             print(f'[{i+1}/{len(sources)}] {source}',flush=True)
-            r = lab.run(cfg['alpha'],Settings(**opts))
+            r = lab.run(cfg['alpha'],Settings(**opts),evaluation=cfg.get('evaluation'))
             name = f'{i+1:02d}_{Path(source).stem}'
             r.save(folder/name)
             records.append(dict(strategy=cfg.get('name',Path(source).stem),start=str(r.daily.index[0].date()),end=str(r.daily.index[-1].date()),
@@ -114,7 +114,7 @@ def main(argv=None):
         print(folder.resolve()/'comparison.html')
         return 0
     config = json.loads(Path(args.strategy).read_text(encoding='utf-8-sig')) if args.strategy else {}
-    if set(config)-{'alpha','settings','name','description'}: parser.error('Unknown strategy keys')
+    if set(config)-{'alpha','settings','name','description','evaluation'}: parser.error('Unknown strategy keys')
     settings = config.get('settings',{}).copy()
     known = {f.name for f in fields(Settings)}
     if set(settings)-known: parser.error(f'Unknown settings: {set(settings)-known}')
@@ -123,7 +123,7 @@ def main(argv=None):
     if args.cash is not None: settings['initial_cash']=args.cash
     alpha = args.alpha if args.alpha is not None else config.get('alpha',DEFAULT_ALPHA)
     print('Computing factor and daily simulation...',flush=True)
-    result = lab.run(alpha,Settings(**settings))
+    result = lab.run(alpha,Settings(**settings),evaluation=config.get('evaluation'))
     output = args.output or str(Path('outputs')/datetime.now().strftime('run_%Y%m%d_%H%M%S_%f'))
     folder = result.save(output)
     print(json.dumps(result.metrics,ensure_ascii=False,indent=2))

@@ -11,10 +11,10 @@ def factor_diagnostics(score,data,start,end,horizons=(1,5,20)):
     """
     price = data.frames['close']*data.frames['cumadj']
     result = pd.DataFrame(index=score.index)
-    result['coverage'] = score.notna().sum(axis=1)
+    result['coverage'] = np.isfinite(score).sum(axis=1)
     for horizon in horizons:
         label = price.shift(-horizon)/price-1
-        valid = score.notna() & label.notna() & np.isfinite(label)
+        valid = np.isfinite(score) & label.notna() & np.isfinite(label)
         x = score.where(valid).rank(axis=1)
         y = label.where(valid).rank(axis=1)
         counts = valid.sum(axis=1)

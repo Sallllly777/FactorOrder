@@ -1,0 +1,22 @@
+{
+  "name": "reversal_evaluation_v1",
+  "description": "固定协议下的反转因子评价示例；同伴需在观察结果前选定。",
+  "alpha": "-rank(ts_return(close, 5))",
+  "settings": {
+    "start": "2023-01-03", "end": "2023-12-29",
+    "top_n": 20, "retain_n": 20, "rebalance": "daily", "gross_exposure": 0.6
+  },
+  "evaluation": {
+    "enabled": true, "direction": 1, "horizons": [1, 5, 10, 20],
+    "primary_horizon": 1, "quantiles": 5, "min_assets": 20, "min_dates": 60,
+    "min_label_coverage": 0.8, "stress_tests": true,
+    "train_start": "2023-01-03", "train_end": "2023-06-30",
+    "validation_start": "2023-07-03", "validation_end": "2023-12-29",
+    "min_reference_ic": 0.005, "min_reference_top_excess": 0.0001,
+    "min_reference_annual_excess": 0.01,
+    "bootstrap_samples": 200, "seed": 17,
+    "family": "reversal-v1", "declared_trials": null, "evidence": "exploratory",
+    "benchmark_alpha": "rank(ts_mean(amt, 20))",
+    "peers": ["rank(ts_mean(amt, 20))"]
+  }
+}

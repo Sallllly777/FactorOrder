@@ -15,10 +15,13 @@ import ast
 import secrets
 
 from .config import Settings
+from .evaluation import EvaluationSpec
 from .factors import Expression
 
 ARTIFACTS={'report.html','manifest.json','daily.csv','orders.csv','holdings.csv','targets.csv',
-           'factor_diagnostics.csv','source_code.zip','checksums.json'}
+           'factor_diagnostics.csv','source_code.zip','checksums.json','evaluation.json',
+           'evaluation_daily.csv','evaluation_quantiles.csv','evaluation_yearly.csv','evaluation_scenarios.csv',
+           'evaluation_stability.csv','evaluation_period_returns.csv'}
 
 
 class JobStore:
@@ -164,7 +167,7 @@ def create_app(*,sources,root='service-data',token=None,timeout=1800,max_queue=8
             thread.join(timeout=10)
             store.release()
 
-    app=FastAPI(title='因序 · 因子研究与回测',version='0.5.0',lifespan=lifespan,docs_url=None,redoc_url=None,openapi_url=None)
+    app=FastAPI(title='因序 · 因子研究与回测',version='0.6.1',lifespan=lifespan,docs_url=None,redoc_url=None,openapi_url=None)
     app.state.jobs=store
 
     async def auth(request:Request):
@@ -197,7 +200,7 @@ def create_app(*,sources,root='service-data',token=None,timeout=1800,max_queue=8
 
     @app.get('/assets/{name}')
     def asset(name:str):
-        if name not in ('app.css','app.js','mark.svg'): raise HTTPException(404,'Asset not found')
+        if name not in ('app.css','app.js','evaluation.js','mark.svg'): raise HTTPException(404,'Asset not found')
         return FileResponse(static/name)
 
     @app.post('/session')
@@ -244,7 +247,7 @@ def create_app(*,sources,root='service-data',token=None,timeout=1800,max_queue=8
             if len(body)>16384: raise HTTPException(413,'Request too large')
         try:
             obj=json.loads(body)
-            if not isinstance(obj,dict) or set(obj)-{'source','alpha','settings'}: raise ValueError('Use source, alpha and settings only')
+            if not isinstance(obj,dict) or set(obj)-{'source','alpha','settings','evaluation'}: raise ValueError('Use source, alpha, settings and evaluation only')
             if obj.get('source') not in registry: raise ValueError('Unknown source ID')
             alpha=obj.get('alpha'); tree=Expression(alpha).tree
             for node in ast.walk(tree):
@@ -254,6 +257,12 @@ def create_app(*,sources,root='service-data',token=None,timeout=1800,max_queue=8
             for name in ('min_history','active_window','liquidity_window','top_n','retain_n','delay','decay','stale_haircut_after','valid_price_window'):
                 if getattr(settings,name)>10000: raise ValueError('Settings exceed service resource limit')
             spec=dict(source=registry[obj['source']],alpha=alpha,settings=settings.to_dict())
+            if 'evaluation' in obj:
+                if not isinstance(obj['evaluation'],dict): raise ValueError('evaluation must be an object')
+                spec['evaluation']=EvaluationSpec(**obj['evaluation']).to_dict()
+                if spec['evaluation']['enabled']:
+                    from .stability import validate_periods
+                    validate_periods(EvaluationSpec(**spec['evaluation']),settings)
             idem=request.headers.get('idempotency-key')
             if idem and (len(idem)>128 or not idem.isascii()): raise ValueError('Invalid idempotency key')
             jid=store.submit(spec,idem,max_queue,max_jobs)
@@ -281,7 +290,7 @@ def create_app(*,sources,root='service-data',token=None,timeout=1800,max_queue=8
         with store.connect() as c: raw=c.execute('SELECT spec FROM jobs WHERE id=?',(jid,)).fetchone()[0]
         spec=json.loads(raw)
         source=next((key for key,value in registry.items() if value==spec['source']),None)
-        return {'source':source,'alpha':spec['alpha'],'settings':spec['settings']}
+        return {'source':source,'alpha':spec['alpha'],'settings':spec['settings'],**({'evaluation':spec['evaluation']} if 'evaluation' in spec else {})}
 
     @app.get('/jobs/{jid}/result',dependencies=[Depends(auth)])
     def result(jid:str):

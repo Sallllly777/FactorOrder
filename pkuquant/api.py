@@ -11,6 +11,7 @@ from .report import Result
 from .diagnostics import factor_diagnostics
 from .security import SecurityHistory, status_coverage
 from .sources import load_source
+from .evaluation import EvaluationSpec, evaluate
 
 
 class Research:
@@ -77,9 +78,15 @@ class Research:
         if not isinstance(panel,Panel): raise TypeError('Python strategies must return a Panel')
         return decay_linear(panel,settings.decay).values.where(eligible)
 
-    def run(self,alpha,settings=None,**kwargs):
+    def run(self,alpha,settings=None,*,evaluation=None,**kwargs):
         if settings is not None and kwargs: raise ValueError('Pass Settings or keyword settings, not both')
         settings = settings or Settings(**kwargs)
+        if evaluation is None: evaluation=EvaluationSpec()
+        elif isinstance(evaluation,dict): evaluation=EvaluationSpec(**evaluation)
+        elif not isinstance(evaluation,EvaluationSpec): raise TypeError('evaluation must be EvaluationSpec or a dictionary')
+        if evaluation.enabled:
+            from .stability import validate_periods
+            validate_periods(evaluation,settings)
         data,eligible,adv,trimmed = self._prepare(settings)
         status=self.security.matrix(data.dates,data.codes,at='09:25:00')
         coverage=status_coverage(status,data.frames['close'].notna())
@@ -105,7 +112,8 @@ class Research:
         if not panel.values.index.equals(data.dates) or not panel.values.columns.equals(data.codes):
             raise ValueError('Strategy changed axes')
         score = decay_linear(panel,settings.decay).values.where(eligible)
-        if score.notna().to_numpy().sum()==0: raise ValueError('Factor has no valid eligible observations')
+        score = score * evaluation.direction
+        if not np.isfinite(score.to_numpy()).any(): raise ValueError('Factor has no finite eligible observations')
         sim = simulate(data,score,eligible,adv,settings,self.states,status)
         limits = [
             '账户采用复权经济单位，隐含公司行动调整及分红再投资；不重建真实分红税、现金到账日与股份可卖日。持仓 shares_equiv 是原始价格对应的经济等效股数。',
@@ -134,4 +142,6 @@ class Research:
                         references=['https://www.worldquant.com/brain/',
                         'https://www.sse.com.cn/lawandrules/sselawsrules2025/trade/universal/c/c_20260424_10816492.shtml'])
         diagnostics = factor_diagnostics(score,data,sim.daily.index[0],sim.daily.index[-1])
-        return Result(sim,settings,metadata,diagnostics)
+        metadata['signal_direction'] = evaluation.direction
+        assessment = evaluate(score,data,eligible,adv,settings,evaluation,sim,self.states,status,metadata) if evaluation.enabled else None
+        return Result(sim,settings,metadata,diagnostics,assessment)

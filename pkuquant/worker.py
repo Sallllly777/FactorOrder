@@ -11,7 +11,7 @@ def main():
     from .config import Settings
     spec=json.loads(Path(sys.argv[1]).read_text(encoding='utf-8'))
     lab=Research(spec['source']['data'],spec['source'].get('states'),spec['source'].get('security_history'),reference_cache=spec['source'].get('reference_cache'))
-    lab.run(spec['alpha'],Settings(**spec['settings'])).save(spec['output'])
+    lab.run(spec['alpha'],Settings(**spec['settings']),evaluation=spec.get('evaluation')).save(spec['output'])
 
 
 if __name__=='__main__': main()

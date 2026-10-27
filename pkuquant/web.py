@@ -4,6 +4,7 @@ import json
 import math
 from pathlib import Path
 from .config import Settings
+from .evaluation import EvaluationSpec
 
 TEMPLATES=[
     {'id':'5dr-current', **json.loads((Path(__file__).parent/'static'/'5dr_current.json').read_text(encoding='utf-8'))},
@@ -42,7 +43,7 @@ def config_view(registry):
         sources.append(entry)
     defaults=Settings(start='2023-01-03',end='2023-12-29').to_dict()
     return {'defaults':defaults,'templates':TEMPLATES,'operators':OPERATORS_HELP,'sources':sources,
-            'mode':'research_only','version':'0.5.0'}
+            'evaluation_defaults':EvaluationSpec().to_dict(),'mode':'research_only','version':'0.6.1'}
 
 
 def result_view(folder):
@@ -61,7 +62,19 @@ def result_view(folder):
         indices=sorted({round(i*(total-1)/2499) for i in range(2500)})
         points=[points[i] for i in indices]
     quality=manifest.get('quality',{})
+    evaluation=manifest.get('evaluation'); evaluation_series=[]
+    if evaluation and (folder/'evaluation_daily.csv').is_file():
+        main=evaluation['protocol']['evaluation']['primary_horizon']
+        with (folder/'evaluation_daily.csv').open(encoding='utf-8-sig',newline='') as f:
+            for row in csv.DictReader(f):
+                if int(row['horizon'])!=main: continue
+                ic=float(row['rank_ic']) if row['rank_ic'] else None
+                evaluation_series.append({'date':row['date'],'rank_ic':ic if ic is not None and math.isfinite(ic) else None})
+    evaluation_dates=len(evaluation_series)
+    if evaluation_dates>2500:
+        evaluation_series=[evaluation_series[round(i*(evaluation_dates-1)/2499)] for i in range(2500)]
     return {'metrics':manifest['metrics'],'settings':manifest['settings'],'expression':manifest['expression'],
+            'evaluation':evaluation,'evaluation_series':evaluation_series,'evaluation_series_sampled':evaluation_dates>2500,
             'limitations':manifest.get('limitations',[]),'st_coverage':manifest.get('st_coverage',{}),
             'readiness':manifest.get('readiness',{}),'factor_diagnostics':manifest.get('factor_diagnostics',{}),
             'synthetic':bool(quality.get('provenance',{}).get('synthetic')),

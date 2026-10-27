@@ -46,10 +46,12 @@ def _svg(values,color,baseline=None):
 
 
 class Result:
-    def __init__(self, sim,settings,metadata,diagnostics=None):
+    def __init__(self, sim,settings,metadata,diagnostics=None,evaluation=None):
         self.daily,self.orders,self.holdings,self.targets = sim.daily,sim.orders,sim.holdings,sim.targets
         self.settings,self.metadata = settings,metadata
         self.metrics = metrics(sim,settings)
+        self.evaluation = evaluation
+        self.metadata['evaluation'] = evaluation.summary if evaluation is not None else None
         self.diagnostics = diagnostics if diagnostics is not None else pd.DataFrame()
         self.metadata['factor_diagnostics'] = {
             col: {'mean':float(self.diagnostics[col].mean()) if self.diagnostics[col].notna().any() else None,
@@ -82,6 +84,7 @@ class Result:
         for name in ('daily','orders','holdings','targets'):
             getattr(self,name).to_csv(path/f'{name}.csv',index=name=='daily',encoding='utf-8-sig')
         self.diagnostics.to_csv(path/'factor_diagnostics.csv',encoding='utf-8-sig')
+        if self.evaluation is not None: self.evaluation.save(path)
         code_hash = hashlib.sha256()
         with zipfile.ZipFile(path/'source_code.zip','w',compression=zipfile.ZIP_DEFLATED) as archive:
             for file in sorted(Path(__file__).parent.glob('*.py')):
@@ -130,6 +133,7 @@ body{{margin:0;background:#0c1424;color:#e2e8f0;font:15px/1.7 system-ui,"Microso
 <h2>分年度收益</h2>{year.to_html(escape=True)}<p class="muted">首尾年度可能为非完整年度；年度结果不是独立样本外检验。</p>
 <h2>因子诊断：未来 1 / 5 / 20 日 Rank IC</h2>{ic.to_html(escape=True)}<p class="muted">仅用于事后研究的收盘到收盘标签，不代表可执行收益。缺失未来端点的样本排除并记录数量；多日标签重叠，未声称独立样本显著性。标签不进入策略数据接口。</p>
 <h2>未成交及部分成交原因</h2>{reasons.to_html(escape=True)}
+{self.evaluation.html() if self.evaluation is not None else '<h2>因子评价</h2><p>未启用评价。</p>'}
 <p>期末停滞行情持仓估值：{m['end_stale_exposure']:,.2f}；历史最大停滞行情持仓估值：{m['max_stale_exposure']:,.2f}。未强制假设清仓。</p>
 <h2>模型假设与数据限制</h2><ul>{warnings}</ul>
 <h2>配置</h2><pre class="panel">{esc(json.dumps(self.settings.to_dict(),ensure_ascii=False,indent=2))}</pre>

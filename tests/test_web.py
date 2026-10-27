@@ -83,5 +83,66 @@ class WebTests(unittest.TestCase):
         self.assertLess(response['curve'][first_loss]['drawdown'],0)
         self.assertAlmostEqual(response['curve'][first_loss]['drawdown'],result.daily.nav.iloc[first_loss]/settings().initial_cash-1)
 
+    def test_evaluation_api_roundtrip_and_artifact(self):
+        from pkuquant import EvaluationSpec
+        with TestClient(self.app) as c:
+            self.login(c)
+            headers={'X-PKUQuant-Request':'1'}
+            spec=dict(source='test',alpha='rank(amt)',settings=settings().to_dict(),
+                      evaluation=json.loads(json.dumps(EvaluationSpec(min_assets=3,min_dates=20,bootstrap_samples=0,family='api-test').to_dict())))
+            self.assertEqual(c.get('/assets/evaluation.js').status_code,200)
+            self.assertIn('evaluation_defaults',c.get('/ui/config').json())
+            invalid={**spec,'evaluation':{'evidence':'validated'}}
+            self.assertEqual(c.post('/jobs',json=invalid,headers=headers).status_code,422)
+            invalid={**spec,'evaluation':{'peers':['__import__("os")']}}
+            self.assertEqual(c.post('/jobs',json=invalid,headers=headers).status_code,422)
+            response=c.post('/jobs',json=spec,headers=headers)
+            self.assertEqual(response.status_code,202,response.text);jid=response.json()['id']
+            deadline=time.monotonic()+20
+            while time.monotonic()<deadline:
+                job=c.get('/jobs/'+jid).json()
+                if job['status'] not in ('queued','running'):break
+                time.sleep(.02)
+            self.assertEqual(job['status'],'succeeded',job)
+            self.assertEqual(c.get(f'/jobs/{jid}/strategy').json(),spec)
+            result=c.get(f'/jobs/{jid}/result').json()
+            self.assertEqual(result['evaluation']['status'],'insufficient_evidence')
+            self.assertIsNone(result['evaluation']['score']['total'])
+            self.assertEqual(len(result['evaluation_series']),8)
+            artifact=c.get(f'/jobs/{jid}/artifacts/evaluation.json')
+            self.assertEqual(artifact.status_code,200)
+            self.assertEqual(artifact.json()['evidence']['family'],'api-test')
+
+    def test_training_validation_protocol_roundtrip(self):
+        from pkuquant import EvaluationSpec
+        from test_evaluation import panel_fixture
+        from test_stability import split_spec
+        data,_,_=panel_fixture(100)
+        path=data.export(self.root/'stability-market')
+        app=create_app(sources={'test':{'data':str(path)}},root=self.root/'stability-jobs',token=self.token)
+        with TestClient(app) as c:
+            self.login(c);headers={'X-PKUQuant-Request':'1'}
+            evaluation=json.loads(json.dumps(EvaluationSpec(**split_spec(data)).to_dict()))
+            spec=dict(source='test',alpha='rank(amt)',settings=settings().to_dict(),evaluation=evaluation)
+            invalid={**spec,'evaluation':{**evaluation,'validation_start':evaluation['train_end']}}
+            self.assertEqual(c.post('/jobs',json=invalid,headers=headers).status_code,422)
+            invalid={**spec,'settings':settings(start=evaluation['validation_start']).to_dict()}
+            self.assertEqual(c.post('/jobs',json=invalid,headers=headers).status_code,422)
+            response=c.post('/jobs',json=spec,headers=headers)
+            self.assertEqual(response.status_code,202,response.text);jid=response.json()['id']
+            deadline=time.monotonic()+25
+            while time.monotonic()<deadline:
+                job=c.get('/jobs/'+jid).json()
+                if job['status'] not in ('queued','running'):break
+                time.sleep(.02)
+            self.assertEqual(job['status'],'succeeded',job)
+            self.assertEqual(c.get(f'/jobs/{jid}/strategy').json(),spec)
+            e=c.get(f'/jobs/{jid}/result').json()['evaluation']
+            self.assertEqual(e['score']['version'],'heuristic-1.1')
+            self.assertEqual(e['stability']['status'],'evaluated')
+            self.assertFalse(e['stability']['independently_verified'])
+            for name in ('evaluation_stability.csv','evaluation_period_returns.csv'):
+                self.assertEqual(c.get(f'/jobs/{jid}/artifacts/{name}').status_code,200)
+
 
 if __name__=='__main__':unittest.main()
