@@ -75,8 +75,58 @@ def main():
             assert config['alpha'] == manifest['expression']
             for key,value in config['settings'].items():
                 if key not in ('start','end'): assert value == manifest['settings'][key], (w, period, key)
+    check_evaluations()
     print(f'PASS: {len(checksums)} public files; {len(runs)} runs; NAV, returns, fees, orders, IC, configs and SHA-256.')
     print('This verifies published output consistency, not raw-data authenticity, future performance or live execution.')
+
+
+def check_evaluations():
+    folder = ROOT / 'evaluation'
+    hashes = load(folder / 'checksums.json')
+    actual = {p.relative_to(folder).as_posix() for p in folder.rglob('*')
+              if p.is_file() and p != folder / 'checksums.json'}
+    assert actual == set(hashes), 'Unexpected or missing evaluation export'
+    for name, digest in hashes.items():
+        assert hashlib.sha256((folder / name).read_bytes()).hexdigest() == digest, name
+    provenance = load(folder / 'provenance.json')
+    for export in provenance['exports']:
+        path = folder / 'results' / export['factor']
+        for name, digest in export['original_artifact_sha256'].items():
+            assert hashlib.sha256((path / name).read_bytes()).hexdigest() == digest, name
+        e = load(path / 'evaluation.json'); strategy = load(path / 'strategy.json')
+        assert strategy['alpha'] == export['expression']
+        assert strategy['settings'] == e['protocol']['settings']
+        assert strategy['evaluation'] == e['protocol']['evaluation']
+        assert e['comparison_sha256'] == provenance['comparison_sha256']
+        score = e['score']; items = score['items']
+        assert sum(x['weight'] for x in items) == 100
+        for x in items:
+            if x['grade'] is None: assert x['points'] is None
+            else: close(x['points'], x['weight'] * x['grade'] / 4, 'item points')
+        close(sum(x['points'] or 0 for x in items), score['earned_points'], 'score sum')
+        weight = sum(x['weight'] for x in items if x['grade'] is not None)
+        assert score['evaluated_weight'] == weight
+        if weight == 100: close(score['total'], score['earned_points'], 'total')
+        else: assert score['total'] is None
+        returns = rows(path / 'evaluation_period_returns.csv')
+        for period in e['stability']['periods']:
+            data = [r for r in returns if r['period'] == period['name']]
+            opts = period['portfolio']['settings']
+            for role in ('candidate', 'benchmark'):
+                previous = peak = opts['initial_cash']; worst = 0.0
+                for r in data:
+                    nav = float(r[role + '_nav'])
+                    close(float(r[role + '_return']), nav / previous - 1, 'period daily return')
+                    peak = max(peak, nav); worst = min(worst, nav / peak - 1); previous = nav
+                m = period['portfolio'][role]
+                assert len(data) == m['trading_days']
+                close(previous / opts['initial_cash'] - 1, m['total_return'], 'period return')
+                close((previous / opts['initial_cash']) ** (opts['annualization'] / len(data)) - 1,
+                      m['annual_return'], 'period annual return')
+                close(worst, m['max_drawdown'], 'period drawdown')
+    from build_evaluation_report import render
+    assert (folder / 'report.html').read_bytes() == render().encode('utf-8'), 'Stale evaluation HTML'
+    print('PASS: four factor evaluations, score arithmetic, independent NAV/returns/drawdowns and offline HTML.')
 
 
 if __name__ == '__main__': main()

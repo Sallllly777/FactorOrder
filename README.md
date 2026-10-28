@@ -14,6 +14,10 @@ v0.6.1补充训练—验证稳定性：在评价协议填写四个日期，并�
 
 ## 三个示例因子
 
+**[新增：四个历史因子的评分报告](example_factors/evaluation/README.md)**，包含基础5DR及日内5/10/20日反转的新版分项评分、训练—验证稳定性、可复跑配置和完整评价CSV。该报告采用新的区间隔离口径，属于另存的研究快照；下方原历史报告数值保留。
+
+![历史因子评分总览](example_factors/evaluation/screenshots/score-overview.jpg)
+
 独立目录 **[example_factors](example_factors/README.md)** 包含策略配置、综合报告、训练/验证报告、逐日资金曲线、委托和持仓账本、因子诊断及校验和。
 
 | 示例 | 训练累计净收益 | 验证累计净收益 | 验证最大回撤 |

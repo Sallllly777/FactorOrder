@@ -1,0 +1,98 @@
+{
+  "export_date": "2026-10-28",
+  "application_version": "0.6.1",
+  "evaluation_version": "1.1",
+  "scoring_version": "heuristic-1.1",
+  "source": "feathers.zip (not distributed)",
+  "comparison_sha256": "839fadcd1e7b49bd5907d4c9c2cf1ad3fe2f4c7045590e0e4f336ae9675dd54e",
+  "exports": [
+    {
+      "factor": "baseline",
+      "expression": "-rank(ts_return(close, 5))",
+      "created_utc": "2026-10-27T14:48:13.332728+00:00",
+      "source_sha256": "5766950f2a105244867b842709cf4bad890e4e11df0eebeeaa4fec42dc05803d",
+      "code_sha256": "07a814ecae1566d475c5e7ae550aaa6b87b5d1a934a5eb2da9de3e27e244ac02",
+      "python": "3.13.8",
+      "packages": {
+        "numpy": "2.2.3",
+        "pandas": "2.2.3",
+        "pyarrow": "26.0.0"
+      },
+      "original_artifact_sha256": {
+        "evaluation.json": "28146bfbbc1fd00e5c1bbe7a84c1e7fccfa14105872ffb59a7c333fe23c247a9",
+        "evaluation_daily.csv": "2ee9d47642d626a3f8e6e34800a2de881d59759605a01917cc6596f784d760bc",
+        "evaluation_period_returns.csv": "c8d0d408d3f333f7cd21e7f9122f4db30f4c4a4dca72edad3a1b342674b4352c",
+        "evaluation_quantiles.csv": "541acdb75baa5c363370c351c0e4d6f0caa193dfc770dd7b5ac4eb29a73f4b59",
+        "evaluation_scenarios.csv": "742ab042f5f62be8960aaa84dbdea5a1290525f7e3cd7b26cf602ff85ee82a97",
+        "evaluation_stability.csv": "1bbfaa364663f02024bd78e4dc9ff2b7ab1b0e24c4b4d85585e7ea1404aa8504",
+        "evaluation_yearly.csv": "e130fa03887f40942f28a4bc36ab61d2238f4bf8b0da07d3144bff7985fc4b3b"
+      }
+    },
+    {
+      "factor": "5",
+      "expression": "-rank(ts_sum(log(close / open), 5))",
+      "created_utc": "2026-10-27T14:50:35.002595+00:00",
+      "source_sha256": "5766950f2a105244867b842709cf4bad890e4e11df0eebeeaa4fec42dc05803d",
+      "code_sha256": "07a814ecae1566d475c5e7ae550aaa6b87b5d1a934a5eb2da9de3e27e244ac02",
+      "python": "3.13.8",
+      "packages": {
+        "numpy": "2.2.3",
+        "pandas": "2.2.3",
+        "pyarrow": "26.0.0"
+      },
+      "original_artifact_sha256": {
+        "evaluation.json": "c9d6f7e67bd188ee13ba8da66fa54ce9ac8aecdc95d30acd858e76c98808342c",
+        "evaluation_daily.csv": "508b43369d6b2a5943e9a044e7ad98b1614dbcb5bdcf1effa47c319eaee98b39",
+        "evaluation_period_returns.csv": "68038cf8505e08c77fae287a9f7fdf21efe34c6b15b7d41071117557c659756f",
+        "evaluation_quantiles.csv": "a2b80ef37d8500efd2b3dfb286a3f40c9dd96471fbb33a3dbfe7a1d0224638ed",
+        "evaluation_scenarios.csv": "a325ade64bf46026450f6e7ec0a77ab20072ba6df6b9b03392609e96c0b236a5",
+        "evaluation_stability.csv": "84b16a0a14d1359afe549c22214aa170e37263c49a28dfd2dd660900799f330f",
+        "evaluation_yearly.csv": "6880de0ff6cec53dbc9c9ded697b2b9966c1ac270eb92ccc3c2c27f4d6b4ead3"
+      }
+    },
+    {
+      "factor": "10",
+      "expression": "-rank(ts_sum(log(close / open), 10))",
+      "created_utc": "2026-10-28T14:09:12.629889+00:00",
+      "source_sha256": "5766950f2a105244867b842709cf4bad890e4e11df0eebeeaa4fec42dc05803d",
+      "code_sha256": "07a814ecae1566d475c5e7ae550aaa6b87b5d1a934a5eb2da9de3e27e244ac02",
+      "python": "3.13.8",
+      "packages": {
+        "numpy": "2.2.3",
+        "pandas": "2.2.3",
+        "pyarrow": "26.0.0"
+      },
+      "original_artifact_sha256": {
+        "evaluation.json": "e39aa6d4ecce6385b1c82ea8d827ec72d3434bbfcada54c5b40c85bb0b0d7bee",
+        "evaluation_daily.csv": "23f6a4d4ff068cf3f0803fe557ecd0abe301d7c2f8ba6f61a83b6251ccdb7069",
+        "evaluation_period_returns.csv": "606e6ef4653f9f512fd356bea7588b555a047ca59a1be0631bf3ace9a7dd5361",
+        "evaluation_quantiles.csv": "f011207599bce68f9733cb092ce270c6914db15c58e67d6161ed5d98140dbce2",
+        "evaluation_scenarios.csv": "630a52d2f2b3d2c4fcd77c354ec72f89d5ff8bfa8b2ac49bc8870bbd8702ab74",
+        "evaluation_stability.csv": "9f9814e16a3d74df48fed2e1207aae2f81f34eb50261d8fcf6a71b82f727ee8f",
+        "evaluation_yearly.csv": "f60614bc7ea958f7944fa99892ba5454f9178fc2f9bd4826521eed19d21b168c"
+      }
+    },
+    {
+      "factor": "20",
+      "expression": "-rank(ts_sum(log(close / open), 20))",
+      "created_utc": "2026-10-28T14:06:52.317157+00:00",
+      "source_sha256": "5766950f2a105244867b842709cf4bad890e4e11df0eebeeaa4fec42dc05803d",
+      "code_sha256": "07a814ecae1566d475c5e7ae550aaa6b87b5d1a934a5eb2da9de3e27e244ac02",
+      "python": "3.13.8",
+      "packages": {
+        "numpy": "2.2.3",
+        "pandas": "2.2.3",
+        "pyarrow": "26.0.0"
+      },
+      "original_artifact_sha256": {
+        "evaluation.json": "d663ecd659b1c68a2255569cc5d75579d652283d8d9c61ce51b625b7f8f862ac",
+        "evaluation_daily.csv": "ea62e3d49342a497743d81f54f0903ccb512d5aaeb85b88fe9efca0c2b0c0f7f",
+        "evaluation_period_returns.csv": "33d82aed5fcdd20653a8d08dda98f7a322bd11a00bd3865c88f8861b670e4bd6",
+        "evaluation_quantiles.csv": "fb55b00a5dadbeb92e7532818cbf8fcdbbdcaee4376e0daaf0819f314d570337",
+        "evaluation_scenarios.csv": "e6a3cb110dfc154418bde7b80f994ac2fd022fe0ec848a83f0faa5a18654560d",
+        "evaluation_stability.csv": "8a49cc8422e9811e886b8122083b3754bb5b710208500e91fa6fb320c1acdb10",
+        "evaluation_yearly.csv": "08ac2ece483279e0848208ac7b4ab0c1b52ed822d4af197bf67630b19d224e17"
+      }
+    }
+  ]
+}
