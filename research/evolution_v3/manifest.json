@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "scope": "Published research files only; hash consistency is not proof of market-data correctness.",
+  "files": {
+    "data/evidence.json": "1858d98119d55937db39368660c8acd7b55092803e112efde1cfb689b37f57ee",
+    "data/provenance.json": "36be24eaf98a1f3b0d0da76464aa184ebb459ef93f96626acdd4e07ca01b4d43",
+    "figures/ic_sharpe.png": "9affc28071524e26c5311d6151eadc4e6e3ff13c623786322cdcbb4ee79cb293",
+    "method_snapshot/evolution_v2_evaluate.py": "a81b1483fde480c3e7bd3343a43d7bebf128190675384c2bef0f75a490f46582",
+    "method_snapshot/evolution_v3_generate.py": "96882a54472d885d2476a319d457480b1e8f433912506676b386f178fbe29897",
+    "method_snapshot/evolution_v3_model.py": "e832181e4e38330c7c36839c50fb8a7e8666ddf65e54a22304677d8ea3bfcffb",
+    "method_snapshot/evolution_v3_resume.py": "203c8374d008c2a656cdb650e0d07dd0cfc95b97209738e7f16bca95a117fbf4",
+    "method_snapshot/evolution_v3_run.py": "90c346e8d2d660b46188d25e12bf628afb4a86305a92e8e1ce74f7d6df8b74fe",
+    "method_snapshot/evolution_v3_runtime.py": "30ef312fadfd32258562b2f9fd0247f113f4930938e2af3da382fc8d4c395ec6",
+    "method_snapshot/manifest.json": "65e74ec1bb9dad10eeb984433d5e3d29ad38ad75c4d5b2280ffc2837e2300c6d",
+    "method_snapshot/README.md": "0860a1e96ad9edd0ff1d8959cfc9dc9522d15c91d30cc3c1a8de06da2984a55c",
+    "README.md": "d74bba245cbc617117738970810993765b18722cf60a56df84a88b97a0621338",
+    "REPORT.md": "cf8ba0a1b05e2c773982efd95e2c1ea12878d1a41ab7e4ddd4ceae37d81d4456",
+    "rules/evolution_v2_rules.py": "403ae7cfa4ed57be9e75ccd94a3cd6d27bab4b477ef97266c96d0ae43c23bd1a",
+    "rules/evolution_v3_rules.py": "3fe01bc6c2d527fece536a48e60478f582a6165b04e5588a38f705a820afa00c",
+    "strategies/A29_g2_s010.json": "ed1b4151ce7c99949c0d6f3c20af1e1933c568bcb46e971c12959af71342d4a2",
+    "strategies/B29_g6_s012.json": "5ee8d62e3f82b2fcbf7fb7ab16d174e8e2045660978a62c8ca6ec3dce6e99806",
+    "strategies/seed_10.json": "0e7d047724399d66a1d854bdbc9b53b365750c450c0d72cbe122404207c759b2",
+    "strategies/seed_20.json": "3698197493e96128c7e691015c5780dc88789ba7f3caa4394816f655cf215346",
+    "strategies/seed_5.json": "76f05326ec629804e91f7083b842efd0372d6f3ed5eb7ff3e3c5e7e9376c1387",
+    "strategies/seed_baseline.json": "4d075d818c8c53756752c333fc38798d100972cd4cdfa00f660e7899f5ce06b1",
+    "verify_submission.py": "30615a92772126a53ef6b2f2e7a5fe9173c45233f7d716c46b5d06e3559c1b8a"
+  }
+}

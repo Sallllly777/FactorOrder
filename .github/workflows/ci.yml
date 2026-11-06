@@ -19,5 +19,6 @@ jobs:
       - run: python -m pip install -e ".[service,test]"
       - run: python -m unittest discover -s tests -v
       - run: python scripts/verify_examples.py
+      - run: python research/evolution_v3/verify_submission.py
       - run: python examples/provider_demo.py --output outputs/ci_demo
       - run: python -m pip wheel --no-deps . --wheel-dir dist
